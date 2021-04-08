@@ -1,0 +1,129 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlinx-serialization'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 210401001 // yymmdd000
+        versionName "0.0.6-poc01" // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
+        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        dataBinding true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+
+dependencies {
+
+    implementation Libs.multidex
+    implementation Libs.kotlin_stdlib_jdk
+    implementation Libs.core_ktx
+    implementation Libs.appcompat
+
+    testImplementation Libs.robolectric
+    testImplementation Libs.mokito_core
+    testImplementation Libs.mokito_inline
+    testImplementation Libs.mokito_android
+//    testImplementation Libs.mokito_kotlin
+
+    testImplementation Libs.junit
+    androidTestImplementation Libs.testJunit
+    androidTestImplementation Libs.espresso_core
+
+    testImplementation Libs.androidx_test
+//    androidTestImplementation Libs.androidx_test
+//    androidTestImplementation Libs.androidx_test_runner
+//    androidTestImplementation Libs.androidx_test_rules
+
+    // Android Support/Architecture
+    implementation Libs.constraintlayout
+    implementation Libs.lifecycle_extensions
+    implementation Libs.lifecycle_viewmodel_ktx
+    implementation Libs.lifecycle_livedata_ktx
+    implementation Libs.material
+
+    implementation Libs.activity_ktx
+    implementation Libs.fragment_ktx
+
+    implementation Libs.koin_core
+    testImplementation Libs.koin_test
+    implementation Libs.koin_core_ext
+//    androidTestImplementation Libs.koin_test
+
+    // AndroidX Scope 생성 - 삭제 자동화
+    implementation Libs.koin_androidx_scope
+    implementation Libs.koin_androidx_viewmodel
+    implementation Libs.koin_androidx_fragment
+    implementation Libs.koin_androidx_ext
+
+    // Retorofit
+    implementation Libs.retrofit
+    implementation Libs.converter_gson
+    implementation Libs.logging_interceptor
+
+    // Gson
+    implementation Libs.gson
+
+    // Logger
+    implementation Libs.logger
+
+    // Rx
+    implementation Libs.rxjava
+    implementation Libs.rxandroid
+    implementation Libs.rxjava2_debug
+
+    // loading animation
+    implementation Libs.spinKit
+
+//    debugImplementation Libs.chuck
+//    releaseImplementation Libs.releaseChuck
+
+    implementation Libs.serialization
+
+}

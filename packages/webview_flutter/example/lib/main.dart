@@ -8,7 +8,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:webview_flutter/iamport_flutter_plugin_sdk.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/iamport_response.dart';
+import 'package:webview_flutter/payment_data.dart';
+import 'package:webview_flutter/certification_data.dart';
 
 void main() => runApp(MaterialApp(home: WebViewExample()));
 
@@ -46,7 +51,7 @@ class _WebViewExampleState extends State<WebViewExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter WebView example'),
+        title: const Text('앱바앱바앱바앱바앱바'),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
           NavigationControls(_controller.future),
@@ -57,7 +62,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
-          initialUrl: 'https://flutter.dev',
+          initialUrl: 'https://www.iamport.kr/',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
@@ -288,6 +293,41 @@ class SampleMenu extends StatelessWidget {
   }
 }
 
+void startPayment() {
+  String userCode = "imp96304110";
+
+  PaymentData data = PaymentData.fromJson({
+    'pg': "danal_tpay",
+    'payMethod': "card",
+    'name': "플러터 민족 주문~",
+    'amount': int.parse("1000"),
+    'merchantUid': "mid_${DateTime.now().millisecondsSinceEpoch}",
+    'buyerName': "김빙봉",
+  });
+
+  payment(userCode, data);
+}
+
+Future<void> payment(String userCode, PaymentData data) async {
+  String? iamportResponseJson;
+  try {
+    // log('log me', name: 'payment 호출했단다');
+
+    iamportResponseJson =
+        await IamportFlutterPluginSdk.payment(userCode, data.toJsonString());
+  } on PlatformException {
+    iamportResponseJson = 'Failed to get iamportResponseJson';
+  }
+
+  if (iamportResponseJson == null) {
+    return;
+  }
+
+  IamPortResponse response =
+      IamPortResponse.fromJson(jsonDecode(iamportResponseJson));
+  // log('log me', name: '${response.toJsonString()}');
+}
+
 class NavigationControls extends StatelessWidget {
   const NavigationControls(this._webViewControllerFuture)
       : assert(_webViewControllerFuture != null);
@@ -305,6 +345,10 @@ class NavigationControls extends StatelessWidget {
         final WebViewController controller = snapshot.data!;
         return Row(
           children: <Widget>[
+            ElevatedButton(
+              child: Text('결제해보기'),
+              onPressed: startPayment,
+            ),
             IconButton(
               icon: const Icon(Icons.arrow_back_ios),
               onPressed: !webViewReady
@@ -321,31 +365,31 @@ class NavigationControls extends StatelessWidget {
                       }
                     },
             ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: !webViewReady
-                  ? null
-                  : () async {
-                      if (await controller.canGoForward()) {
-                        await controller.goForward();
-                      } else {
-                        // ignore: deprecated_member_use
-                        Scaffold.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("No forward history item")),
-                        );
-                        return;
-                      }
-                    },
-            ),
-            IconButton(
-              icon: const Icon(Icons.replay),
-              onPressed: !webViewReady
-                  ? null
-                  : () {
-                      controller.reload();
-                    },
-            ),
+            // IconButton(
+            //   icon: const Icon(Icons.arrow_forward_ios),
+            //   onPressed: !webViewReady
+            //       ? null
+            //       : () async {
+            //           if (await controller.canGoForward()) {
+            //             await controller.goForward();
+            //           } else {
+            //             // ignore: deprecated_member_use
+            //             Scaffold.of(context).showSnackBar(
+            //               const SnackBar(
+            //                   content: Text("No forward history item")),
+            //             );
+            //             return;
+            //           }
+            //         },
+            // ),
+            // IconButton(
+            //   icon: const Icon(Icons.replay),
+            //   onPressed: !webViewReady
+            //       ? null
+            //       : () {
+            //           controller.reload();
+            //         },
+            // ),
           ],
         );
       },
